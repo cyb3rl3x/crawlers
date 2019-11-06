@@ -1,0 +1,42 @@
+import time
+#import json
+from selenium import webdriver
+from bs4 import BeautifulSoup as bs
+
+# abre o browser
+browser = webdriver.Chrome()
+
+# define a url a ser carregada
+browser.get("https://twitter.com/search?l=&q=esquerda%20OR%20direita%20since%3A2013-01-01%20until%3A2013-12-31&src=typd&lang=pt")
+
+# Faz pagedown na página até que ela carregue por completo com intervalos de 1 segundo.
+lenOfPage = browser.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
+match=False
+while(match==False):
+        lastCount = lenOfPage
+        time.sleep(1)
+        lenOfPage = browser.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
+        if lastCount==lenOfPage:
+            match=True
+
+# busca elementos pela classe css 
+tweets = browser.find_elements_by_class_name('tweet-text')
+
+#imprime todos os elementos
+i=0
+for tweet in tweets:
+    print('[ 0'+str(i)+' ]'+ tweet.text)
+    
+    i=i+1
+    
+
+#converte para texto e para texto em utf-8
+tweetys = [tweet.text for tweet in tweets]    
+tweetys2 = [tweet.text.encode('utf-8') for tweet in tweets]    
+    
+import numpy as np    
+import pandas as pd
+
+pd.DataFrame(tweetys2).to_csv('C:\caminho')
+
+np.savetxt('base7.csv', tweetys2, delimiter=',', fmt='%10s')    
