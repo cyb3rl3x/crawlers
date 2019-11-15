@@ -1,0 +1,31 @@
+import time
+from selenium import webdriver
+from bs4 import BeautifulSoup
+
+from selenium.webdriver.chrome.options import Options  
+
+
+url = 'https://g1.globo.com/economia/'
+
+chrome_options = Options()  
+chrome_options.add_argument("--headless")  
+
+browser = webdriver.Chrome()
+browser.get(url)
+
+# Selenium script to scroll to the bottom, wait 3 seconds for the next batch of data to load, then continue scrolling.  It will continue to do this until the page stops loading new data.
+lenOfPage = browser.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
+match=False
+while(match==False):
+        lastCount = lenOfPage
+        time.sleep(1)
+        lenOfPage = browser.execute_script("window.scrollTo(0, document.body.scrollHeight);var lenOfPage=document.body.scrollHeight;return lenOfPage;")
+        if lastCount==lenOfPage:
+            match=True
+
+noticias = browser.find_elements_by_class_name('feed-post-body-title')
+
+i=0
+for noticia in noticias:
+    print('[ 0'+str(i)+' ]'+ noticia.text)
+    i=i+1
